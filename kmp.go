@@ -27,25 +27,25 @@ func preprocess(s string)[]int{
 }
 
 //kembalikan jumlah karakter
-func search(pattern string, text string) int {
+func kmpSearch(pattern string, text string) int {
 	var pre[] int = preprocess(pattern)
 	var pos[] int
-	idx := 0
+	j := 0
 	for i:=0;i<len(text);i++ {
-		if text[i] == pattern[idx] {
-			if idx == (len(pattern)-1) {
-				pos = append(pos,i-idx)
-				idx = 0
+		if text[i] == pattern[j] {
+			if j == (len(pattern)-1) {
+				pos = append(pos,i-j)
+				j = 0
 			} else {
-				idx++
+				j++
 			}
 		} else {
-			if idx > 0 {
-				for idx > 0 && text[i] != pattern[idx] {
-					idx = pre[idx-1]
+			if j > 0 {
+				for j > 0 && text[i] != pattern[j] {
+					j = pre[j-1]
 				}
-				if text[i] == pattern[idx] {
-					idx++
+				if text[i] == pattern[j] {
+					j++
 				}
 			}
 		}
@@ -110,7 +110,7 @@ func main() {
 			//assignment agar pencarian dapat dilakukan
 			a1 := texts[i]
 			a2 := keywords[j]
-			amount = search(a2,a1) //cari kata dengan KMP
+			amount = kmpSearch(a2,a1) //cari kata dengan KMP
 		}
 		check[i] = amount //jumlah kata yang ditemukan pada text ke-i
 		fmt.Println(check[i])
