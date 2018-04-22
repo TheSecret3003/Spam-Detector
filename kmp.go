@@ -71,48 +71,63 @@ func read(path string) ([]string,error) {
 	return lines,scan.Err()
 }
 
+//fungsi periksa maksimum
+func max(a,b int) int {
+	if a>b {
+		return a
+	}
+	return b
+}
+
 func main() {
+	
 	//read file external
-	in,erri := read("test.txt")
+	in,erri := read("input.txt")
 	if erri != nil {
 		log.Fatalf("error: %s",erri)
 	}
-	//pecah hasil read file jadi keyword dan text
-	var keywords,texts []string
-	keywords = strings.Split(in[0],";")
-	texts = strings.Split(in[1],";")
-
-	//test print keyword
-	fmt.Println("\nKeywords:")
-	fmt.Println(len(keywords))
-	for i:=0;i<len(keywords);i++{
-		fmt.Print("("+keywords[i]+") ")
-	}
-	//test print text
-	fmt.Println()
-	fmt.Println("Texts:")
-	fmt.Println(len(texts))
-	for i:=0;i<len(texts);i++{
-		fmt.Print(texts[i]+" ")
+	//ambil keyword
+	keywords := strings.Split(in[0],";")
+	//print keyword
+	for i:=0;i<len(keywords);i++ {
+		fmt.Print(keywords[i]+" ")
 	}
 	fmt.Println()
+	//ambil text per baris
+	var line []string
+	for i:=1;i<len(in);i++ {
+		line = append(line,in[i])
+	}
+	//gabungkan text per baris
+	text := strings.Join(line[:],"\n")
+	fmt.Println(text) // print
+	//pisahkan text per baris menurut separator 
+	texts := strings.Split(text,";")
+	//print text
+	for i:=0;i<len(texts);i++ {
+		fmt.Println(texts[i])
+	}
 
 	var check []int //periksa jumlah kata yang ditemukan
 	var spam []int //list isi text yang merupakan spam
 	var notspam []int //list isi text yang bukan spam
+
+	//inisiasi list jumlah kata ditemukan
 	for i:=0;i<len(texts);i++{
 		check = append(check,0)
 	}
 	//test KMP
 	for i:=0;i<len(texts);i++ {
 		amount:= 0 //jumlah kata yang ditemukan
+		max_amount := 0 //jumlah kata maksimum yang ditemukan
+		a1 := texts[i] //assign text
 		for j:=0;j<len(keywords);j++ {
 			//assignment agar pencarian dapat dilakukan
-			a1 := texts[i]
-			a2 := keywords[j]
+			a2 := keywords[j] //assign keyword
 			amount = kmpSearch(a2,a1) //cari kata dengan KMP
+			max_amount = max(amount,max_amount) 
 		}
-		check[i] = amount //jumlah kata yang ditemukan pada text ke-i
+		check[i] = max_amount //jumlah kata yang ditemukan pada text ke-i
 		fmt.Println(check[i])
 		//jika tidak ditemukan, maka text bukan spam
 		if check[i] == 0 {
@@ -129,7 +144,7 @@ func main() {
 
 	//write ke file eksternal
 	//format: spam1,spam2,spam3;notspam1,notspam2,notspam3
-	out,erro := os.Create("result-kmp.txt")
+	out,erro := os.Create("result.txt")
 	if erro != nil {
 		log.Fatalf("error making file: %s",erro)
 	}
